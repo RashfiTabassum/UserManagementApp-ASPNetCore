@@ -1,0 +1,45 @@
+﻿@model LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<h2>Login</h2>
+
+<!-- Display success or error messages -->
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success mt-2" role="alert">
+        @TempData["Message"]
+    </div>
+}
+
+
+
+<form asp-action="Login" method="post" novalidate>
+    <!-- Validation summary -->
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label" title="Enter your registered email"></label>
+        <input asp-for="Email" class="form-control" autocomplete="username" placeholder="example@mail.com" />
+        <span asp-validation-for="Email" class="text-danger" title="Invalid email format"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Password" class="form-label" title="Enter your password"></label>
+        <input asp-for="Password" type="password" class="form-control" autocomplete="current-password" placeholder="Your password" />
+        <span asp-validation-for="Password" class="text-danger" title="Password is required"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary" title="Click to log in">Login</button>
+</form>
+<p class="mt-2">
+    Don't have an account?
+    <a asp-controller="Account" asp-action="Register">Register here</a>.
+</p>
+
+
+@* @if (TempData["Message"] != null) *@
+@* { *@
+@*     <div class="alert alert-danger mt-2">@TempData["Message"]</div> *@
+@* } *@

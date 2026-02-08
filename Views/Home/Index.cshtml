@@ -1,0 +1,14 @@
+﻿@if (TempData["StatusMessage"] != null)
+{
+    <div class="alert alert-info text-center">
+        @TempData["StatusMessage"]
+    </div>
+}
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>

@@ -1,0 +1,42 @@
+﻿@model RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h2>Register</h2>
+
+<!-- Display success or error messages -->
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success mt-2" role="alert">
+        @TempData["Message"]
+    </div>
+}
+
+<form asp-action="Register" method="post" novalidate>
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label asp-for="UserName" class="form-label" title="Choose a username"></label>
+        <input asp-for="UserName" class="form-control" placeholder="Your username" />
+        <span asp-validation-for="UserName" class="text-danger" title="Username is required"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label" title="Enter your email address"></label>
+        <input asp-for="Email" class="form-control" placeholder="example@mail.com" />
+        <span asp-validation-for="Email" class="text-danger" title="Enter a valid email"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Password" class="form-label" title="Choose a password"></label>
+        <input asp-for="Password" type="password" class="form-control" placeholder="Your password" />
+        <span asp-validation-for="Password" class="text-danger" title="Password is required"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary" title="Click to register">Register</button>
+</form>
+
+<p class="mt-2">
+    Already have an account? <a asp-controller="Account" asp-action="Login">Login here</a>.
+</p>

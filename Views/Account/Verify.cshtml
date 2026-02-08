@@ -1,0 +1,54 @@
+﻿@* @{ *@
+@*     ViewData["Title"] = "Verify Email"; *@
+@* } *@
+
+@* <h2>Email Verification</h2> *@
+
+@* <p>Your account is currently <span class="badge bg-warning">Unverified</span>.</p> *@
+
+@* <p>This page simulates email verification.</p> *@
+
+@* <a class="btn btn-success" *@
+@*    href="@Url.Action("ConfirmEmail", "Account", new { *@
+@*         userId = ViewBag.UserId, *@
+@*         token = ViewBag.Token *@
+@*    })"> *@
+@*     Click This Button *@
+@* </a> *@
+@* <script> *@
+@*     const btn = document.querySelector(".btn-success"); *@
+@*     btn.addEventListener("click", () => { *@
+@*         btn.disabled = true; *@
+@*         btn.innerText = "Verifying..."; *@
+@*     }); *@
+@* </script> *@
+@{
+    ViewData["Title"] = "Verify Email";
+    var message = Context.Request.Query["message"].ToString();
+
+}
+
+<h2>Email Verification</h2>
+
+@if (!string.IsNullOrEmpty(message) && message == "verifyfirst")
+{
+    <div class="alert alert-warning">
+        Please verify your email first to access the user management page.
+    </div>
+}
+
+<p>Your account is currently <span class="badge bg-warning">Unverified</span>ll.</p>
+@* //<p>This page simulates email verification.</p> *@
+
+<a class="btn btn-success" href="@Url.Action("ConfirmEmail", "Account", new { userId = ViewBag.UserId, token = ViewBag.Token })">
+    Click This Button
+</a>
+
+
+<script>
+    const btn = document.querySelector(".btn-success");
+    btn.addEventListener("click", () => {
+        btn.disabled = true;
+        btn.innerText = "Verifying...";
+    });
+</script>

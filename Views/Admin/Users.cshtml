@@ -1,0 +1,90 @@
+﻿@model List<ApplicationUser>
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<h2>User Management</h2>
+<!-- Status / Success Messages -->
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success mt-2" role="alert">
+        @TempData["Message"]
+    </div>
+}
+
+<!-- Error Messages -->
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger mt-2" role="alert">
+        @TempData["Error"]
+    </div>
+}
+
+<form method="post" asp-action="UserAction" id="userForm">
+    <div class="mb-2 d-flex gap-2 flex-wrap">
+        <button type="submit" name="actionType" value="Block" class="btn btn-danger" title="Block selected users">
+            <i class="bi bi-lock-fill"></i> Block
+        </button>
+
+        <button type="submit" name="actionType" value="Unblock" class="btn btn-success" title="Unblock selected users">
+            <i class="bi bi-unlock-fill"></i>
+        </button>
+
+        <button type="submit" name="actionType" value="Delete" class="btn btn-secondary" title="Delete selected users">
+            <i class="bi bi-trash-fill"></i> 
+        </button>
+
+        <button type="submit" name="actionType" value="DeleteUnverified" class="btn btn-clean" title="Delete all unverified users">
+            <i class="fas fa-broom"></i>
+        </button>
+    </div>
+
+    <table class="table table-bordered table-striped table-hover">
+        <thead class="table-light">
+            <tr>
+                <th><input type="checkbox" id="selectAll" title="Select / Deselect all users" /></th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Last Login</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr title="User: @user.UserName, Status: @user.Status">
+                    <td>
+                        <input type="checkbox" name="selectedUserIds" value="@user.Id" />
+                    </td>
+                    <td>@user.UserName</td>
+                    <td>@user.Email</td>
+                    <td>@(user.LastLoginTime.HasValue ? user.LastLoginTime.Value.ToString("g") : "-")</td>
+                    @* <td>@user.Status</td> *@
+                    <td>
+                        @switch (user.Status)
+                        {
+                            case UserStatus.Unverified:
+                                <span class="badge bg-warning">Unverified</span>
+                                break;
+                            case UserStatus.Active:
+                                <span class="badge bg-success">Active</span>
+                                break;
+                            case UserStatus.Blocked:
+                                <span class="badge bg-danger">Blocked</span>
+                                break;
+                        }
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+</form>
+
+<script>
+    // Select / Deselect all checkboxes
+    document.getElementById("selectAll").addEventListener("click", function () {
+        var checkboxes = document.querySelectorAll("input[name='selectedUserIds']");
+        checkboxes.forEach(cb => cb.checked = this.checked);
+    });
+</script>
