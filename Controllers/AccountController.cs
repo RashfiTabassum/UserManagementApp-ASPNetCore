@@ -98,7 +98,7 @@ public class AccountController : Controller
         return View();
     }
 
-    
+
     [HttpPost]
     public async Task<IActionResult> Login(LoginViewModel model)
     {
@@ -106,27 +106,17 @@ public class AccountController : Controller
             return View(model);
 
         var user = await _userManager.FindByEmailAsync(model.Email);
-
         if (user == null)
         {
             ModelState.AddModelError("", "Email not found. Please register first.");
             return View(model);
         }
 
-
-        // Check if user is blocked
         if (user.Status == UserStatus.Blocked)
         {
             ModelState.AddModelError("", "Your account is blocked");
             return View(model);
         }
-
-        // unverified users can still login
-        //if (!await _userManager.IsEmailConfirmedAsync(user))
-        //{
-        //    ModelState.AddModelError("", "Please confirm your email before logging in.");
-        //    return View(model);
-        //}
 
         var result = await _signInManager.PasswordSignInAsync(user.UserName, model.Password, false, false);
 
@@ -135,22 +125,22 @@ public class AccountController : Controller
             user.LastLoginTime = DateTime.Now;
             await _userManager.UpdateAsync(user);
 
-            // Add Status as a claim
-            var claims = new List<System.Security.Claims.Claim>
-            {
-                new System.Security.Claims.Claim("UserStatus", user.Status.ToString())
-            };
+            // ✅ Sign in with status claim
+            await _signInManager.SignOutAsync(); // ensure fresh login
+            var claims = new List<Claim>
+        {
+            new Claim("UserStatus", user.Status.ToString())
+        };
             await _signInManager.SignInWithClaimsAsync(user, isPersistent: false, claims);
-
 
             TempData["StatusMessage"] = $"Your account status is: {user.Status}";
             return RedirectToAction("Index", "Home");
         }
 
-
         ModelState.AddModelError("", "Invalid email or password");
         return View(model);
     }
+
 
 
     // GET: /Account/Logout
@@ -173,28 +163,48 @@ public class AccountController : Controller
             return RedirectToAction("Login");
 
         var result = await _userManager.ConfirmEmailAsync(user, token);
-
         if (!result.Succeeded)
         {
             TempData["Message"] = "Email confirmation failed.";
             return RedirectToAction("Login");
         }
 
-        // ✅ CHANGE IS HERE (no condition needed)
+        // Update status
         user.Status = UserStatus.Active;
         await _userManager.UpdateAsync(user);
 
-        TempData["Message"] = "Email confirmed! Your account is now verified.";
-        return RedirectToAction("Login");
+        //// Auto-login after verification
+        //await _signInManager.SignInAsync(user, isPersistent: false);
+        //TempData["Message"] = "Email confirmed! You are now logged in.";
+        //return RedirectToAction("Index", "Home");
+
+        // ✅ Sign in the user with the updated claim
+        await _signInManager.SignOutAsync(); // ensure fresh login
+        var claims = new List<Claim>
+        {
+            new Claim("UserStatus", user.Status.ToString())
+        };
+        await _signInManager.SignInWithClaimsAsync(user, isPersistent: false, claims);
+
+        TempData["Message"] = "Email confirmed! You are now logged in.";
+        return RedirectToAction("Index", "Home");
     }
 
     [HttpGet]
-    public IActionResult Verify()
+    public IActionResult Verify(string message = null)
     {
         ViewBag.UserId = TempData["ConfirmUserId"];
         ViewBag.Token = TempData["ConfirmToken"];
+        ViewBag.Message = message;
+
+        // Keep TempData for next request
+        TempData.Keep("ConfirmUserId");
+        TempData.Keep("ConfirmToken");
+
         return View();
     }
+
+
 
 
 

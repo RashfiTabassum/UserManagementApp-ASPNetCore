@@ -25,3 +25,6 @@ body {
     font-weight: bold;
     color: #0d6efd; /* Bootstrap primary color */
 }
+.nav-link:hover {
+    color: #0d6efd;
+}

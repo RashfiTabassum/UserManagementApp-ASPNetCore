@@ -15,15 +15,43 @@ public class AdminController : Controller
     }
 
     // GET: /Admin/Users
+    //public async Task<IActionResult> Users()
+    //{
+    //    // Get all users, sorted by LastLoginTime descending
+    //    var users = await _userManager.Users
+    //        .OrderByDescending(u => u.LastLoginTime)
+    //        .ToListAsync();
+
+    //    return View(users);
+    //}
     public async Task<IActionResult> Users()
     {
-        // Get all users, sorted by LastLoginTime descending
+        // Get currently logged-in user
+        var currentUser = await _userManager.GetUserAsync(User);
+
+        if (currentUser == null)
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
+        // ❗ Block access if user is NOT Active
+        if (currentUser.Status != UserStatus.Active)
+        {
+            return RedirectToAction(
+                "Verify",
+                "Account",
+                new { message = "verifyfirst" }
+            );
+        }
+
+        // Allowed → fetch users
         var users = await _userManager.Users
             .OrderByDescending(u => u.LastLoginTime)
             .ToListAsync();
 
         return View(users);
     }
+
 
     // POST: /Admin/UserAction
     [HttpPost]
